@@ -1,0 +1,32 @@
+# Smart Mobility Le Mans
+
+An automated dashboard that helps answer one question: with limited resources, where and when should Le Mans Métropole improve its public transport network first?
+
+**Live dashboard:** https://omar-el-moujahid.github.io/Smart-Mobility-Le-Mans/
+
+## How it works
+
+- **Static pipeline (monthly):** downloads SETRAM's GTFS feed, counts scheduled stop-visits and links each stop to its nearest commune.
+- **Real-time pipeline (every 15 minutes):** reads SETRAM's GTFS-RT feeds, saves delays per route and updates the dashboard.
+
+## Dashboard
+
+- Network average delay, reporting routes and active alerts
+- Average delay by route
+- Ranking of the 20 communes by scheduled supply per 1,000 residents
+
+## Technologies
+
+Python, pandas, GTFS, GTFS-RT, GitHub Actions, GitHub Pages, Chart.js
+
+## Project structure
+
+- `scripts/`: data pipelines
+- `.github/workflows/`: automation
+- `data/`: reference data and history
+- `docs/`: dashboard
+
+## Limits
+
+- Population is a proxy for demand, not real ridership.
+- GTFS-RT has no archive, so recurring patterns need several weeks of collected data.
