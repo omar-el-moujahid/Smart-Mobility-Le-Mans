@@ -1,0 +1,1 @@
+3 . i would chose to go withe ligne per station cuz what we will lose in ligne per route very imoprtante we woukd b=not have a clear visibilte for the station or where schedule probleme have been commited but we will have a huge ,umber of lignes 
