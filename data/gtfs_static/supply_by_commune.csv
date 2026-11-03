@@ -1,0 +1,21 @@
+rank,commune,population,n_stops,stop_visits,busiest_stop,visits_per_1000,top_stop_share
+1,La-Chapelle-Saint-Aubin,2319,53,2343,Émile Delahaye,1010.3,0.035
+2,Coulaines,8226,105,6267,La Paix,761.9,0.018
+3,Rouillon,2666,41,1906,St-Joseph,714.9,0.099
+4,Allonnes,10846,69,4017,Lycée André Malraux,370.4,0.04
+5,Arnage,5548,34,1638,Oasis-Centre des Expositions,295.2,0.118
+6,Yvre-l-Eveque,4269,22,750,Avenue du Mans,175.7,0.068
+7,Saint-Saturnin,2864,21,490,Cinémas CGR,171.1,0.116
+8,La-Milesse,2650,15,425,Four à Chanvre,160.4,0.202
+9,Sarge-les-le-Mans,3941,15,630,Bignon,159.9,0.067
+10,Le Mans,148876,329,22900,Gares,153.8,0.011
+11,Ruaudin,3542,22,536,Guetteloup,151.3,0.099
+12,Champagne,3728,19,425,Auvours,114.0,0.061
+13,Mulsanne,5352,18,525,Stade Mulsanne,98.1,0.08
+14,Aigne,1724,6,138,Mairie Aigné,80.0,0.167
+15,Pruille-le-Chetif,1357,8,88,Stade Asnillé,64.8,0.125
+16,Fay,770,3,44,Église Fay,57.1,0.5
+17,Trange,1678,6,87,Maisons Rouges,51.8,0.172
+18,Chaufour-Notre-Dame,1187,3,58,La Denisière,48.9,0.5
+19,Saint-Georges-du-Bois,2308,7,96,Centre Commercial,41.6,0.25
+20,Fatines,937,2,38,Place de l'Église,40.6,0.658
