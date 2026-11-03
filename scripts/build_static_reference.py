@@ -1,4 +1,4 @@
-import csv, io, math, os, zipfile
+import csv, io, json, math, os, zipfile
 import requests
 import pandas as pd
 
@@ -34,6 +34,38 @@ def nearest_commune(lat, lon, communes):
         if best_dist is None or d < best_dist:
             best_dist, best_name = d, c["commune"]
     return best_name
+
+def build_supply_view(freq, communes_df):
+    """Metric: scheduled stop-visits per representative weekday, per 1,000 residents.
+
+    Starts from the communes table (left join) so that a commune with no stop stays
+    in the ranking with 0 instead of silently disappearing. top_stop_share and
+    n_stops are there to expose the metric's weak spot: one very busy stop can make
+    a commune look well served.
+    """
+    rollup = freq.groupby("nearest_commune").agg(
+        n_stops=("stop_id", "size"),
+        stop_visits=("daily_trip_count", "sum"),
+        busiest_stop_visits=("daily_trip_count", "max"),
+    ).reset_index().rename(columns={"nearest_commune": "commune"})
+    busiest = (
+        freq.sort_values("daily_trip_count", ascending=False)
+        .drop_duplicates("nearest_commune")[["nearest_commune", "stop_name"]]
+        .rename(columns={"nearest_commune": "commune", "stop_name": "busiest_stop"})
+    )
+    view = communes_df[["commune", "population"]].merge(rollup, on="commune", how="left")
+    view = view.merge(busiest, on="commune", how="left")
+    count_cols = ["n_stops", "stop_visits", "busiest_stop_visits"]
+    view[count_cols] = view[count_cols].fillna(0).astype(int)
+    view["busiest_stop"] = view["busiest_stop"].fillna("")
+    view["visits_per_1000"] = (view["stop_visits"] / view["population"] * 1000).round(1)
+    view["top_stop_share"] = (
+        view["busiest_stop_visits"] / view["stop_visits"].where(view["stop_visits"] > 0)
+    ).fillna(0).round(3)
+    view = view.drop(columns="busiest_stop_visits")
+    view = view.sort_values("visits_per_1000", ascending=False).reset_index(drop=True)
+    view.insert(0, "rank", view.index + 1)
+    return view
 
 def main():
     communes_df = pd.read_csv("data/reference/communes.csv")
@@ -86,6 +118,15 @@ def main():
     routes[["route_id", "route_short_name", "route_long_name", "route_type"]].to_csv(
         "data/gtfs_static/routes.csv", index=False
     )
+    supply = build_supply_view(freq, communes_df)
+    supply.to_csv("data/gtfs_static/supply_by_commune.csv", index=False)
+    os.makedirs("docs/data", exist_ok=True)
+    with open("docs/data/supply_by_commune.json", "w") as f:
+        json.dump({
+            "service_id": service_id,
+            "metric": "Scheduled stop-visits per representative weekday, per 1,000 residents",
+            "communes": supply.to_dict("records"),
+        }, f, indent=2, ensure_ascii=False)
     print(f"Wrote data/gtfs_static/stops_frequency.csv ({len(freq)} rows)")
     print(f"Wrote data/gtfs_static/routes.csv ({len(routes)} rows)")
     print("Top 5 busiest stops:")

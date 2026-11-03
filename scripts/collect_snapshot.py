@@ -30,7 +30,10 @@ def load_route_names():
     path = "data/gtfs_static/routes.csv"
     if not os.path.exists(path):
         return {}
-    df = pd.read_csv(path, dtype=str)
+    # keep_default_na=False: an empty route_short_name must stay "" (falsy). Read as
+    # NaN it is truthy, is kept as the name, and json.dump writes a bare NaN -- which
+    # is invalid JSON and stops the dashboard from loading at all.
+    df = pd.read_csv(path, dtype=str, keep_default_na=False)
     return {
         row["route_id"]: (row["route_short_name"] or row["route_id"])
         for _, row in df.iterrows()
@@ -46,9 +49,11 @@ def compute_route_aggregates(trip_update_feed):
             if stu.schedule_relationship == 1:  # SKIPPED
                 per_route[route_id]["n_skipped"] += 1
             delay = None
-            if stu.HasField("arrival"):
+            # Check the delay field itself: a stop event may carry only an absolute
+            # time, and reading .delay then returns 0, a fake "perfectly on time".
+            if stu.HasField("arrival") and stu.arrival.HasField("delay"):
                 delay = stu.arrival.delay
-            elif stu.HasField("departure"):
+            elif stu.HasField("departure") and stu.departure.HasField("delay"):
                 delay = stu.departure.delay
             if delay is not None:
                 per_route[route_id]["delays"].append(delay)
